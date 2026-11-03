@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convertisseur image, video, audio, PDF et JSON CSV gratuit</title>
+  <meta name="description" content="Convertissez images, videos, audios, PDF, JSON et CSV gratuitement. PNG JPG WebP HEIC, MP4 GIF WebM, MP3 WMA FLAC, PDF vers PNG/JPG, images vers PDF, JSON CSV avec separateur configurable et apercu avant telechargement.">
+  <meta name="keywords" content="convertir png en jpg, convertir webp en png, convertir heic en jpg, convertir video en gif, convertir mp4 en mp3, convertir wma en mp3, pdf en png, pdf en jpg, images en pdf, json en csv, csv en json, convertisseur gratuit">
+  <meta property="og:title" content="Convertisseur image, video, audio, PDF et JSON CSV gratuit">
+  <meta property="og:description" content="Convertissez images, videos, audios, PDF, JSON et CSV gratuitement avec options sauvegardees et apercu avant telechargement.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://convert.purvanas.fr">
+  <link rel="canonical" href="https://convert.purvanas.fr">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    .header {
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      padding: 1rem 0;
+    }
+    .header h1 { font-size: 1.6rem; font-weight: 300; letter-spacing: -.02em; }
+    .header h1 .accent { color: #f59e0b; font-weight: 500; }
+    .header .subtitle { color: #666; font-size: .85rem; margin-top: .3rem; }
+
+    .format-tags {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem; margin-top: .8rem;
+    }
+    .format-tag {
+      padding: .2rem .55rem; border-radius: 14px; font-size: .65rem; font-weight: 600;
+      letter-spacing: .3px; border: 1px solid #2a2a2a; color: #888; background: #141414;
+    }
+    .format-tag.img { border-color: #f59e0b30; color: #f59e0b; background: #f59e0b10; }
+    .format-tag.vid { border-color: #3b82f630; color: #3b82f6; background: #3b82f610; }
+    .format-tag.aud { border-color: #22c55e30; color: #22c55e; background: #22c55e10; }
+
+    .container { width: 100%; max-width: 500px; margin-top: .5rem; }
+
+    /* Mode toggle */
+    .mode-toggle { display: flex; background: #141414; border-radius: 10px; padding: 3px; margin-bottom: 1.2rem; border: 1px solid #2a2a2a; }
+    .mode-btn { flex: 1; padding: .55rem; border: none; border-radius: 8px; background: transparent; color: #888; font-size: .85rem; cursor: pointer; transition: all .2s; font-weight: 500; }
+    .mode-btn.active { background: #2a2a2a; color: #fff; }
+
+    /* Features */
+    .features { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; margin-bottom: 1.2rem; }
+    .feat { background: #141414; border: 1px solid #2a2a2a; border-radius: 10px; padding: .7rem .4rem; text-align: center; }
+    .feat-icon { font-size: 1.2rem; margin-bottom: .2rem; }
+    .feat-title { font-size: .7rem; font-weight: 600; color: #ccc; }
+    .feat-desc { font-size: .6rem; color: #555; margin-top: .1rem; }
+
+    /* Drop zone */
+    .dropzone { border: 2px dashed #333; border-radius: 12px; padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: all .2s; margin-bottom: 1rem; }
+    .dropzone:hover, .dropzone.dragover { border-color: #f59e0b; background: rgba(245,158,11,0.03); }
+    .dropzone.has-file { border-style: solid; border-color: #333; padding: 1.2rem; }
+    .dropzone-icon { font-size: 2rem; margin-bottom: .5rem; color: #555; }
+    .dropzone-text { color: #888; font-size: .85rem; }
+    .dropzone-text span { color: #f59e0b; font-weight: 500; }
+
+    .file-info { display: none; align-items: center; justify-content: space-between; padding: .5rem 0; font-size: .8rem; margin-bottom: .5rem; }
+    .file-info.visible { display: flex; }
+    .file-info .name { color: #ccc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%; }
+    .file-info .size { color: #888; }
+
+    /* Options */
+    .options { margin-bottom: 1.2rem; }
+    .option-row { display: flex; gap: .6rem; margin-bottom: .6rem; align-items: end; }
+    .option-group { flex: 1; }
+    .option-group label { display: block; font-size: .72rem; color: #666; margin-bottom: .25rem; font-weight: 500; }
+    select, input[type="number"] { width: 100%; background: #141414; border: 1px solid #2a2a2a; color: #e0e0e0; padding: .5rem .6rem; border-radius: 8px; font-size: .82rem; outline: none; transition: border-color .2s; }
+    select:focus, input[type="number"]:focus { border-color: #f59e0b; }
+    select { cursor: pointer; }
+    select option { background: #141414; }
+    input[type="number"]::placeholder { color: #444; }
+    .quality-row { display: flex; align-items: center; gap: .8rem; }
+    .quality-row input[type="range"] { flex: 1; accent-color: #f59e0b; height: 4px; }
+    .quality-val { font-size: .8rem; color: #888; min-width: 35px; text-align: right; }
+    .resize-row { display: flex; gap: .5rem; align-items: center; }
+    .resize-row input { width: 80px; }
+    .resize-x { color: #555; font-size: .8rem; }
+
+    .btn { width: 100%; padding: .7rem; border: none; border-radius: 10px; font-size: .9rem; font-weight: 600; cursor: pointer; transition: all .2s; margin-bottom: .5rem; }
+    .btn:disabled { opacity: .4; cursor: default; }
+    .btn-primary { background: #f59e0b; color: #000; }
+    .btn-primary:hover:not(:disabled) { background: #d97706; }
+    .btn-download { background: #22c55e; color: #fff; }
+    .btn-download:hover { background: #16a34a; }
+    .btn-reset { background: #1e1e1e; color: #888; border: 1px solid #2a2a2a; font-size: .82rem; }
+    .btn-reset:hover { background: #2a2a2a; color: #ccc; }
+
+    .progress-wrap { display: none; margin-bottom: 1rem; }
+    .progress-wrap.visible { display: block; }
+    .progress-bar { height: 4px; background: #1e1e1e; border-radius: 4px; overflow: hidden; margin-bottom: .4rem; }
+    .progress-fill { height: 100%; background: #f59e0b; width: 0%; transition: width .3s; border-radius: 4px; }
+    .progress-fill.indeterminate { width: 30%; animation: slide 1.5s infinite ease-in-out; }
+    @keyframes slide { 0% { margin-left: 0; } 50% { margin-left: 70%; } 100% { margin-left: 0; } }
+    .progress-text { font-size: .75rem; color: #888; text-align: center; }
+
+    .result { display: none; text-align: center; background: #141414; border: 1px solid #2a2a2a; border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; }
+    .result.visible { display: block; }
+    .result-title { font-size: .9rem; color: #22c55e; margin-bottom: .8rem; font-weight: 500; }
+    .result-stats { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 1rem; font-size: .8rem; }
+    .result-stat { text-align: center; }
+    .result-stat .label { color: #666; font-size: .7rem; display: block; margin-bottom: .2rem; }
+    .result-stat .value { color: #ccc; font-weight: 500; }
+    .result-stat .value.smaller { color: #22c55e; }
+    .result-stat .value.bigger { color: #ef5350; }
+    .preview { display: none; margin: .2rem 0 1rem; text-align: left; }
+    .preview.visible { display: block; }
+    .preview-head { display: flex; justify-content: space-between; align-items: center; gap: .6rem; margin-bottom: .5rem; }
+    .preview-title { font-size: .75rem; color: #888; font-weight: 600; }
+    .preview-note { font-size: .68rem; color: #555; }
+    .preview-box { background: #0a0a0a; border: 1px solid #252525; border-radius: 8px; overflow: hidden; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .preview-box img, .preview-box video, .preview-box iframe { width: 100%; max-height: 320px; display: block; border: 0; background: #050505; }
+    .preview-box img { object-fit: contain; }
+    .preview-box audio { width: calc(100% - 1rem); margin: .8rem .5rem; }
+    .preview-text { width: 100%; max-height: 260px; overflow: auto; white-space: pre; padding: .8rem; color: #bbb; font: .72rem/1.45 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .btn-preview { width: auto; padding: .38rem .65rem; margin: 0; border-radius: 7px; background: #1e1e1e; color: #aaa; border: 1px solid #333; font-size: .7rem; }
+    .btn-preview:hover { color: #ddd; border-color: #555; }
+
+    .error-msg { display: none; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef5350; padding: .6rem .8rem; border-radius: 8px; font-size: .8rem; margin-bottom: 1rem; text-align: center; }
+    .error-msg.visible { display: block; }
+
+    .limits { text-align: center; font-size: .7rem; color: #444; margin-top: .5rem; }
+    .footer-app { text-align: center; margin-top: 1rem; font-size: .7rem; color: #444; }
+    .footer-app a { color: #555; text-decoration: none; }
+    .footer-app a:hover { color: #888; }
+
+    .cross-links { display: flex; gap: .5rem; margin-top: 1.2rem; flex-wrap: wrap; justify-content: center; }
+    .cross-link { padding: .45rem .8rem; border: 1px solid #2a2a2a; border-radius: 8px; background: #141414; color: #888; font-size: .72rem; text-decoration: none; transition: all .2s; }
+    .cross-link:hover { border-color: #f59e0b; color: #ccc; }
+    .cross-link span { color: #f59e0b; }
+    .preload-banner { display: none; background: #f59e0b15; border: 1px solid #f59e0b30; border-radius: 10px; padding: .7rem 1rem; margin-bottom: 1rem; font-size: .8rem; color: #f59e0b; text-align: center; }
+    .preload-banner.visible { display: block; }
+
+    /* SEO sections */
+    .seo-section { width: 100%; max-width: 500px; padding: 2rem 0; margin-top: 1rem; border-top: 1px solid #1e1e1e; }
+    .seo-section h2 { font-size: 1.1rem; font-weight: 600; color: #ccc; margin-bottom: .8rem; }
+    .seo-section h3 { font-size: .9rem; font-weight: 600; color: #999; margin: 1.2rem 0 .4rem; }
+    .seo-section p { font-size: .8rem; color: #555; line-height: 1.6; margin-bottom: .8rem; }
+    .conversions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; margin: .8rem 0; }
+    .conv-item { background: #141414; border: 1px solid #1e1e1e; border-radius: 6px; padding: .4rem .6rem; font-size: .7rem; color: #888; text-align: center; }
+    .conv-item span { color: #f59e0b; }
+    .faq { margin-top: 1.5rem; }
+    .faq details { margin-bottom: .6rem; border: 1px solid #1e1e1e; border-radius: 8px; }
+    .faq summary { padding: .7rem 1rem; font-size: .8rem; font-weight: 600; color: #aaa; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: '+'; color: #f59e0b; font-size: 1rem; }
+    .faq details[open] summary::after { content: '-'; }
+    .faq details p { padding: 0 1rem .7rem; margin: 0; }
+
+    .footer { margin-top: auto; padding: 1rem; text-align: center; color: #333; font-size: .65rem; }
+
+    /* Admin */
+    .admin-toggle { position: fixed; bottom: 50px; right: 12px; width: 32px; height: 32px; background: #141414; border: 1px solid #222; border-radius: 8px; color: #444; font-size: .9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; z-index: 9998; }
+    .admin-toggle:hover { border-color: #444; color: #888; }
+    .admin-toggle.active { border-color: #f59e0b; color: #f59e0b; }
+    .admin-panel { display: none; position: fixed; bottom: 90px; right: 12px; background: #141414; border: 1px solid #2a2a2a; border-radius: 10px; padding: .8rem; width: 220px; z-index: 9998; }
+    .admin-panel.visible { display: block; }
+    .admin-panel input { width: 100%; background: #0a0a0a; border: 1px solid #2a2a2a; color: #e0e0e0; padding: .4rem .6rem; border-radius: 6px; font-size: .8rem; outline: none; margin-bottom: .5rem; }
+    .admin-panel input:focus { border-color: #f59e0b; }
+    .admin-panel .admin-btn { width: 100%; padding: .35rem; background: #f59e0b; color: #000; border: none; border-radius: 6px; font-size: .8rem; font-weight: 600; cursor: pointer; }
+    .admin-panel .admin-status { font-size: .7rem; text-align: center; margin-top: .4rem; }
+    .admin-badge { display: none; font-size: .65rem; color: #f59e0b; text-align: center; margin-top: -.5rem; margin-bottom: .8rem; }
+    .admin-badge.visible { display: block; }
+
+    @media (max-width: 480px) {
+      .features { grid-template-columns: 1fr 1fr; }
+      .conversions-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Convertisseur fichiers purvanas.fr","url":"https://convert.purvanas.fr","description":"Convertisseur gratuit pour images, videos, audios, PDF, JSON et CSV avec apercu avant telechargement.","applicationCategory":"MultimediaApplication","operatingSystem":"All","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quels formats sont pris en charge ?","acceptedAnswer":{"@type":"Answer","text":"Le convertisseur accepte les images PNG, JPG, WebP, AVIF, TIFF, BMP, SVG, HEIC/HEIF, les videos MP4, WebM, MOV, MKV, AVI, les audios MP3, WAV, OGG, FLAC, AAC, M4A, WMA, les PDF et les fichiers JSON ou CSV."}},{"@type":"Question","name":"Puis-je voir le resultat avant de telecharger ?","acceptedAnswer":{"@type":"Answer","text":"Oui. Apres conversion, un apercu est affiche automatiquement pour les fichiers raisonnables. Les fichiers plus lourds peuvent etre charges sur demande."}},{"@type":"Question","name":"Comment convertir un PDF en image ?","acceptedAnswer":{"@type":"Answer","text":"Deposez un PDF, choisissez PNG ou JPG, selectionnez une page ou toutes les pages, puis lancez la conversion. Plusieurs pages sont regroupees dans un fichier ZIP."}},{"@type":"Question","name":"Comment convertir JSON en CSV ?","acceptedAnswer":{"@type":"Answer","text":"Deposez un JSON, choisissez CSV, selectionnez le separateur de sortie et l'option d'aplatissement des objets imbriques. Le fichier est parse avec un vrai parseur JSON."}},{"@type":"Question","name":"Est-ce que mes options sont sauvegardees ?","acceptedAnswer":{"@type":"Answer","text":"Oui, les options choisies sont conservees dans le stockage local de votre navigateur pour eviter de les reconfigurer a chaque visite."}},{"@type":"Question","name":"Est-ce que mes fichiers sont stockes ?","acceptedAnswer":{"@type":"Answer","text":"Non. Les fichiers sont traites temporairement sur le serveur et supprimes automatiquement apres conversion ou telechargement."}}]}</script>
+</head>
+<body>
+  <div class="header">
+    <h1><span class="accent">Convertisseur</span></h1>
+    <p class="subtitle">Conversion d'images, videos et audios gratuite en ligne</p>
+    <div class="format-tags">
+      <span class="format-tag img">JPEG</span>
+      <span class="format-tag img">PNG</span>
+      <span class="format-tag img">WebP</span>
+      <span class="format-tag img">AVIF</span>
+      <span class="format-tag img">TIFF</span>
+      <span class="format-tag vid">MP4</span>
+      <span class="format-tag vid">WebM</span>
+      <span class="format-tag vid">GIF</span>
+      <span class="format-tag aud">MP3</span>
+      <span class="format-tag aud">WMA</span>
+      <span class="format-tag aud">FLAC</span>
+      <span class="format-tag">PDF</span>
+      <span class="format-tag">CSV</span>
+      <span class="format-tag">JSON</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="admin-badge" id="admin-badge">Mode admin — aucune limite</div>
+
+    <div class="preload-banner" id="preload-banner">&#9889; Fichier charge depuis Universal Downloader — pret a convertir !</div>
+
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="image">Image</button>
+      <button class="mode-btn" data-mode="video">Video</button>
+      <button class="mode-btn" data-mode="audio">Audio</button>
+      <button class="mode-btn" data-mode="pdf">PDF</button>
+      <button class="mode-btn" data-mode="data">Donnees</button>
+    </div>
+
+    <div class="features" id="features">
+      <div class="feat"><div class="feat-icon">&#128247;</div><div class="feat-title">Images</div><div class="feat-desc">JPEG, PNG, WebP, AVIF, TIFF</div></div>
+      <div class="feat"><div class="feat-icon">&#127909;</div><div class="feat-title">Videos</div><div class="feat-desc">MP4, WebM, GIF</div></div>
+      <div class="feat"><div class="feat-icon">&#9835;</div><div class="feat-title">Audios</div><div class="feat-desc">MP3, WMA, FLAC, WAV</div></div>
+      <div class="feat"><div class="feat-icon">PDF</div><div class="feat-title">PDF</div><div class="feat-desc">PDF vers PNG/JPG</div></div>
+      <div class="feat"><div class="feat-icon">{}</div><div class="feat-title">Donnees</div><div class="feat-desc">JSON, CSV</div></div>
+      <div class="feat"><div class="feat-icon">&#128200;</div><div class="feat-title">Compresser</div><div class="feat-desc">Qualite ajustable</div></div>
+    </div>
+
+    <div class="dropzone" id="dropzone">
+      <div class="dropzone-icon">+</div>
+      <div class="dropzone-text"><span>Choisir un fichier</span> ou glisser-deposer</div>
+    </div>
+    <input type="file" id="file-input" hidden multiple>
+
+    <div class="file-info" id="file-info">
+      <span class="name" id="file-name"></span>
+      <span class="size" id="file-size"></span>
+    </div>
+
+    <div class="options" id="image-opts">
+      <div class="option-row">
+        <div class="option-group">
+          <label>Format de sortie</label>
+          <select id="img-format">
+            <option value="jpeg">JPEG</option>
+            <option value="png">PNG</option>
+            <option value="webp" selected>WebP</option>
+            <option value="avif">AVIF</option>
+            <option value="tiff">TIFF</option>
+            <option value="pdf">PDF</option>
+          </select>
+        </div>
+      </div>
+      <div id="image-pdf-opts" style="display:none">
+        <div class="option-row">
+          <div class="option-group">
+            <label>Taille page PDF</label>
+            <select id="img-pdf-page-size">
+              <option value="auto" selected>Auto</option>
+              <option value="a4">A4</option>
+              <option value="letter">Letter</option>
+            </select>
+          </div>
+          <div class="option-group">
+            <label>Orientation</label>
+            <select id="img-pdf-orientation">
+              <option value="auto" selected>Auto</option>
+              <option value="portrait">Portrait</option>
+              <option value="landscape">Paysage</option>
+            </select>
+          </div>
+        </div>
+        <div class="option-row">
+          <div class="option-group">
+            <label>Ajustement</label>
+            <select id="img-pdf-fit">
+              <option value="contain" selected>Contenir</option>
+              <option value="cover">Remplir</option>
+            </select>
+          </div>
+          <div class="option-group">
+            <label>Marge PDF (pt)</label>
+            <input type="number" id="img-pdf-margin" value="0" min="0" max="144">
+          </div>
+        </div>
+      </div>
+      <div class="option-row">
+        <div class="option-group">
+          <label>Qualite</label>
+          <div class="quality-row">
+            <input type="range" id="img-quality" min="1" max="100" value="85">
+            <span class="quality-val" id="img-quality-val">85</span>
+          </div>
+        </div>
+      </div>
+      <div class="option-row">
+        <div class="option-group">
+          <label>Redimensionner (optionnel)</label>
+          <div class="resize-row">
+            <input type="number" id="img-width" placeholder="Largeur" min="1" max="10000">
+            <span class="resize-x">x</span>
+            <input type="number" id="img-height" placeholder="Hauteur" min="1" max="10000">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="options" id="video-opts" style="display:none">
+      <div class="option-row">
+        <div class="option-group">
+          <label>Format de sortie</label>
+          <select id="vid-format">
+            <option value="mp4" selected>MP4</option>
+            <option value="webm">WebM</option>
+            <option value="gif">GIF</option>
+            <option value="mp3">MP3 (audio seul)</option>
+            <option value="wav">WAV (audio seul)</option>
+            <option value="ogg">OGG (audio seul)</option>
+            <option value="flac">FLAC (audio seul)</option>
+            <option value="aac">AAC (audio seul)</option>
+            <option value="m4a">M4A (audio seul)</option>
+          </select>
+        </div>
+      </div>
+      <div class="option-row">
+        <div class="option-group">
+          <label>Qualite</label>
+          <select id="vid-quality">
+            <option value="low">Basse (petite taille)</option>
+            <option value="medium" selected>Moyenne</option>
+            <option value="high">Haute (grande taille)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="options" id="audio-opts" style="display:none">
+      <div class="option-row">
+        <div class="option-group">
+          <label>Format de sortie</label>
+          <select id="aud-format">
+            <option value="mp3" selected>MP3</option>
+            <option value="wav">WAV</option>
+            <option value="ogg">OGG</option>
+            <option value="opus">Opus</option>
+            <option value="flac">FLAC</option>
+            <option value="aac">AAC</option>
+            <option value="m4a">M4A</option>
+            <option value="wma">WMA</option>
+          </select>
+        </div>
+      </div>
+      <div class="option-row">
+        <div class="option-group">
+          <label>Qualite</label>
+          <select id="aud-quality">
+            <option value="low">Basse (96 kb/s)</option>
+            <option value="medium" selected>Moyenne (192 kb/s)</option>
+            <option value="high">Haute (320 kb/s)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="options" id="pdf-opts" style="display:none">
+      <div class="option-row">
+        <div class="option-group">
+          <label>Format de sortie</label>
+          <select id="pdf-format">
+            <option value="png" selected>PNG</option>
+            <option value="jpg">JPG</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Page</label>
+          <input type="number" id="pdf-page" placeholder="Toutes" min="1" max="9999">
+        </div>
+      </div>
+      <div class="option-row">
+        <div class="option-group">
+          <label>Resolution (DPI)</label>
+          <select id="pdf-dpi">
+            <option value="150">150</option>
+            <option value="200" selected>200</option>
+            <option value="300">300</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Qualite JPG</label>
+          <input type="number" id="pdf-quality" value="90" min="1" max="100">
+        </div>
+      </div>
+    </div>
+
+    <div class="options" id="data-opts" style="display:none">
+      <div class="option-row">
+        <div class="option-group">
+          <label>Format de sortie</label>
+          <select id="data-format">
+            <option value="csv" selected>CSV</option>
+            <option value="json">JSON</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Separateur CSV source</label>
+          <select id="data-input-delimiter">
+            <option value="comma">Virgule (,)</option>
+            <option value="semicolon" selected>Point-virgule (;)</option>
+            <option value="tab">Tabulation</option>
+            <option value="pipe">Pipe (|)</option>
+          </select>
+        </div>
+      </div>
+      <div class="option-row">
+        <div class="option-group">
+          <label>Separateur CSV sortie</label>
+          <select id="data-output-delimiter">
+            <option value="comma">Virgule (,)</option>
+            <option value="semicolon" selected>Point-virgule (;)</option>
+            <option value="tab">Tabulation</option>
+            <option value="pipe">Pipe (|)</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>En-tetes CSV</label>
+          <select id="data-columns">
+            <option value="true" selected>Premiere ligne</option>
+            <option value="false">Aucun en-tete</option>
+          </select>
+        </div>
+      </div>
+      <div class="option-row">
+        <div class="option-group">
+          <label>Types JSON</label>
+          <select id="data-typed">
+            <option value="true" selected>Detecter nombres/booleens</option>
+            <option value="false">Tout en texte</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label>Objets imbriques</label>
+          <select id="data-flatten">
+            <option value="true" selected>Aplatir avec des points</option>
+            <option value="false">Garder brut</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-msg" id="error"></div>
+    <div class="progress-wrap" id="progress">
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="progress-text" id="progress-text">Upload...</div>
+    </div>
+
+    <button class="btn btn-primary" id="convert-btn" disabled>Convertir</button>
+
+    <div class="result" id="result">
+      <div class="result-title">Conversion terminee</div>
+      <div class="result-stats">
+        <div class="result-stat"><span class="label">Original</span><span class="value" id="res-orig"></span></div>
+        <div class="result-stat"><span class="label">Converti</span><span class="value" id="res-conv"></span></div>
+      </div>
+      <div class="preview" id="preview">
+        <div class="preview-head">
+          <span class="preview-title">Apercu</span>
+          <button class="btn btn-preview" id="preview-btn" type="button">Charger l'apercu</button>
+        </div>
+        <div class="preview-box" id="preview-box"></div>
+        <div class="preview-note" id="preview-note"></div>
+      </div>
+      <button class="btn btn-download" id="download-btn">Telecharger</button>
+      <button class="btn btn-reset" id="reset-btn">Nouvelle conversion</button>
+    </div>
+
+    <div class="limits" id="limits"></div>
+    <div class="cross-links">
+      <a class="cross-link" href="https://dl.purvanas.fr"><span>&#8615;</span> Telecharger une video</a>
+      <a class="cross-link" href="https://qr.purvanas.fr"><span>&#9638;</span> Generateur QR Code</a>
+      <a class="cross-link" href="https://drop.purvanas.fr"><span>&#8682;</span> Partager un fichier</a>
+    </div>
+
+    <div class="footer-app">Aucun fichier stocke &middot; Suppression automatique apres conversion<br><a href="https://purvanas.fr">purvanas.fr</a></div>
+  </div>
+
+  <!-- SEO CONTENT -->
+  <div class="seo-section">
+    <h2>Convertisseur de fichiers gratuit avec apercu</h2>
+    <p>Convertissez images, videos, audios, PDF et fichiers de donnees depuis une seule interface. Le type de fichier est detecte automatiquement, les options sont sauvegardees dans votre navigateur, et un apercu du resultat est propose avant le telechargement quand le format le permet.</p>
+
+    <h3>Conversions populaires</h3>
+    <div class="conversions-grid">
+      <div class="conv-item">PNG <span>→</span> JPG</div>
+      <div class="conv-item">HEIC <span>→</span> JPG</div>
+      <div class="conv-item">WebP <span>→</span> PNG</div>
+      <div class="conv-item">MP4 <span>→</span> GIF</div>
+      <div class="conv-item">MP4 <span>→</span> MP3</div>
+      <div class="conv-item">WMA <span>→</span> MP3</div>
+      <div class="conv-item">PDF <span>→</span> PNG</div>
+      <div class="conv-item">Images <span>→</span> PDF</div>
+      <div class="conv-item">JSON <span>→</span> CSV</div>
+      <div class="conv-item">CSV <span>→</span> JSON</div>
+    </div>
+
+    <h3>Images : PNG, JPG, WebP, AVIF, TIFF et HEIC</h3>
+    <p>Convertissez les images courantes entre JPEG, PNG, WebP, AVIF et TIFF, avec qualite ajustable et redimensionnement optionnel. Les fichiers HEIC/HEIF issus d'iPhone sont acceptes quand le serveur peut les decoder.</p>
+
+    <h3>Videos : MP4, WebM et GIF</h3>
+    <p>Transformez une video en MP4, WebM ou GIF anime. Pour les GIF, la qualite choisie ajuste la resolution, la duree et le nombre d'images par seconde afin d'equilibrer rendu visuel et poids final.</p>
+
+    <h3>Audio et extraction depuis une video</h3>
+    <p>Convertissez MP3, WAV, OGG, Opus, FLAC, AAC, M4A et WMA. Vous pouvez aussi deposer une video et choisir un format audio comme MP3 pour extraire uniquement la piste sonore.</p>
+
+    <h3>PDF vers images et images vers PDF</h3>
+    <p>Convertissez un PDF en PNG ou JPG, page par page. Si plusieurs pages sont generees, elles sont regroupees dans une archive ZIP. Vous pouvez aussi selectionner plusieurs images et creer un PDF avec taille de page, orientation, marge et ajustement personnalisables.</p>
+
+    <h3>JSON et CSV avec separateur configurable</h3>
+    <p>Convertissez JSON vers CSV et CSV vers JSON avec un vrai parseur. Choisissez le separateur CSV, indiquez si la premiere ligne contient les en-tetes, activez la detection des nombres et booleens, et aplatissez les objets JSON imbriques en colonnes de type <code>user.name</code>.</p>
+
+    <h3>Apercu avant telechargement</h3>
+    <p>Apres conversion, les images, GIF, videos, audios, PDF et fichiers JSON/CSV peuvent etre visualises directement dans la page. L'apercu se charge automatiquement pour les petits fichiers, ou sur demande si le fichier converti risque d'etre lourd.</p>
+
+    <div class="faq">
+      <h2>Questions frequentes</h2>
+      <details>
+        <summary>Est-ce que le site choisit le bon mode automatiquement ?</summary>
+        <p>Oui. Deposez simplement votre fichier : image, video, audio, PDF, CSV ou JSON. Le convertisseur active le bon mode et affiche les options adaptees.</p>
+      </details>
+      <details>
+        <summary>Puis-je previsualiser le resultat ?</summary>
+        <p>Oui. Un apercu s'affiche apres conversion pour les formats compatibles. Les gros fichiers demandent un clic supplementaire pour eviter de charger trop de donnees inutilement.</p>
+      </details>
+      <details>
+        <summary>Comment convertir un PDF en PNG ou JPG ?</summary>
+        <p>Deposez votre PDF, choisissez PNG ou JPG, reglez la resolution DPI et indiquez une page precise si besoin. Sans page precise, toutes les pages sont converties et regroupees dans un ZIP.</p>
+      </details>
+      <details>
+        <summary>Comment convertir plusieurs images en PDF ?</summary>
+        <p>Selectionnez plusieurs images en meme temps. Le mode Image passe automatiquement en sortie PDF et propose taille de page, orientation, marge et ajustement.</p>
+      </details>
+      <details>
+        <summary>Le convertisseur JSON CSV est-il fiable ?</summary>
+        <p>Oui. Les fichiers JSON et CSV sont lus avec de vrais parseurs, avec gestion du BOM UTF-8, separateur configurable, typage optionnel et aplatissement des objets imbriques.</p>
+      </details>
+      <details>
+        <summary>Est-ce que mes fichiers sont stockes ?</summary>
+        <p>Non. Les fichiers sont traites temporairement sur le serveur puis supprimes automatiquement. Aucun compte n'est necessaire.</p>
+      </details>
+    </div>
+  </div>
+
+  <div class="footer">convert.purvanas.fr — Outil gratuit et open source</div>
+
+  <button class="admin-toggle" id="admin-toggle" title="Admin">&#128274;</button>
+  <div class="admin-panel" id="admin-panel">
+    <input type="password" id="admin-code" placeholder="Code admin">
+    <button class="admin-btn" id="admin-btn">Activer</button>
+    <div class="admin-status" id="admin-status"></div>
+  </div>
+
+<script>
+(function() {
+  let mode = 'image';
+  let selectedFile = null;
+  let selectedFiles = [];
+  let downloadUrl = null;
+  let adminCode = localStorage.getItem('adminCode') || '';
+
+  const MEDIA_TYPES = {
+    image: {
+      extensions: ['jpg', 'jpeg', 'png', 'webp', 'avif', 'tif', 'tiff', 'gif', 'bmp', 'svg', 'heic', 'heif'],
+      mimePrefixes: ['image/'],
+      mimes: ['image/heic', 'image/heif'],
+      defaultFormat: 'webp'
+    },
+    video: {
+      extensions: ['mp4', 'webm', 'mkv', 'avi', 'mov', 'flv', 'ogv', '3gp', 'm4v'],
+      mimePrefixes: ['video/'],
+      defaultFormat: 'mp4'
+    },
+    audio: {
+      extensions: ['mp3', 'wav', 'ogg', 'oga', 'opus', 'flac', 'aac', 'm4a', 'wma', 'weba', 'aiff', 'aif', 'alac'],
+      mimePrefixes: ['audio/'],
+      mimes: ['application/ogg', 'application/x-ms-wma'],
+      defaultFormat: 'mp3'
+    },
+    pdf: {
+      extensions: ['pdf'],
+      mimePrefixes: [],
+      mimes: ['application/pdf'],
+      defaultFormat: 'png'
+    },
+    data: {
+      extensions: ['csv', 'json'],
+      mimePrefixes: [],
+      mimes: ['text/csv', 'application/csv', 'application/json', 'text/json'],
+      defaultFormat: 'csv'
+    }
+  };
+  const AUDIO_OUTPUT_FORMATS = ['mp3', 'wav', 'ogg', 'opus', 'flac', 'aac', 'm4a', 'wma'];
+
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('file-input');
+  const fileInfo = document.getElementById('file-info');
+  const convertBtn = document.getElementById('convert-btn');
+  const progressWrap = document.getElementById('progress');
+  const progressFill = document.getElementById('progress-fill');
+  const progressText = document.getElementById('progress-text');
+  const result = document.getElementById('result');
+  const errorEl = document.getElementById('error');
+  const previewWrap = document.getElementById('preview');
+  const previewBox = document.getElementById('preview-box');
+  const previewBtn = document.getElementById('preview-btn');
+  const previewNote = document.getElementById('preview-note');
+
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchMode(btn.dataset.mode);
+      reset();
+    });
+  });
+
+  function switchMode(nextMode) {
+    mode = nextMode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    document.getElementById('image-opts').style.display = mode === 'image' ? 'block' : 'none';
+    document.getElementById('video-opts').style.display = mode === 'video' ? 'block' : 'none';
+    document.getElementById('audio-opts').style.display = mode === 'audio' ? 'block' : 'none';
+    document.getElementById('pdf-opts').style.display = mode === 'pdf' ? 'block' : 'none';
+    document.getElementById('data-opts').style.display = mode === 'data' ? 'block' : 'none';
+    updateAccept();
+  }
+
+  function updateAccept() {
+    fileInput.accept = 'image/*,video/*,audio/*,.jpg,.jpeg,.png,.webp,.avif,.tif,.tiff,.gif,.bmp,.svg,.heic,.heif,.mp4,.webm,.mkv,.avi,.mov,.flv,.ogv,.3gp,.m4v,.mp3,.wav,.ogg,.oga,.opus,.flac,.aac,.m4a,.wma,.weba,.aiff,.aif,.alac,.pdf,.csv,.json';
+  }
+  updateAccept();
+
+  document.getElementById('img-quality').addEventListener('input', function() { document.getElementById('img-quality-val').textContent = this.value; });
+  document.getElementById('img-format').addEventListener('change', updateImagePdfOptions);
+  function updateImagePdfOptions() {
+    document.getElementById('image-pdf-opts').style.display = document.getElementById('img-format').value === 'pdf' ? 'block' : 'none';
+  }
+  updateImagePdfOptions();
+
+  function bindSavedOption(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const key = 'converter.option.' + id;
+    const saved = localStorage.getItem(key);
+    if (saved !== null) el.value = saved;
+    const eventName = el.tagName === 'SELECT' ? 'change' : 'input';
+    el.addEventListener(eventName, () => localStorage.setItem(key, el.value));
+  }
+  [
+    'img-format', 'img-quality', 'img-width', 'img-height', 'img-pdf-page-size', 'img-pdf-orientation', 'img-pdf-fit', 'img-pdf-margin',
+    'vid-format', 'vid-quality', 'aud-format', 'aud-quality',
+    'pdf-format', 'pdf-page', 'pdf-dpi', 'pdf-quality',
+    'data-format', 'data-input-delimiter', 'data-output-delimiter', 'data-columns', 'data-typed', 'data-flatten'
+  ].forEach(bindSavedOption);
+  updateImagePdfOptions();
+
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+  dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('dragover'); if (e.dataTransfer.files.length) selectFiles(Array.from(e.dataTransfer.files)); });
+  fileInput.addEventListener('change', () => { if (fileInput.files.length) selectFiles(Array.from(fileInput.files)); });
+
+  function getMediaKind(file) {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const mime = (file.type || '').toLowerCase();
+    for (const kind of ['image', 'video', 'audio', 'pdf', 'data']) {
+      const cfg = MEDIA_TYPES[kind];
+      if (mime && ((cfg.mimes || []).includes(mime) || cfg.mimePrefixes.some(prefix => mime.startsWith(prefix)))) return kind;
+      if (ext && cfg.extensions.includes(ext)) return kind;
+    }
+    return null;
+  }
+
+  function selectFiles(files) {
+    const detectedModes = files.map(getMediaKind);
+    if (detectedModes.some(kind => !kind)) { showError("Format non supporte. Ajoutez une image, une video, un audio, un PDF, un CSV ou un JSON."); return; }
+    const uniqueModes = [...new Set(detectedModes)];
+    if (files.length > 1 && (uniqueModes.length !== 1 || uniqueModes[0] !== 'image')) {
+      showError("La selection multiple est reservee a Images vers PDF.");
+      return;
+    }
+    const detectedMode = uniqueModes[0];
+    switchMode(detectedMode);
+    selectedFiles = files;
+    selectedFile = files[0];
+    if (files.length > 1) {
+      document.getElementById('img-format').value = 'pdf';
+      updateImagePdfOptions();
+    } else if (detectedMode === 'data' && localStorage.getItem('converter.option.data-format') === null) {
+      const ext = (selectedFile.name.split('.').pop() || '').toLowerCase();
+      document.getElementById('data-format').value = ext === 'json' ? 'csv' : 'json';
+    }
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    document.getElementById('file-name').textContent = files.length > 1 ? files.length + ' images selectionnees' : selectedFile.name;
+    document.getElementById('file-size').textContent = humanSize(totalSize);
+    fileInfo.classList.add('visible');
+    dropzone.classList.add('has-file');
+    dropzone.querySelector('.dropzone-icon').textContent = '';
+    dropzone.querySelector('.dropzone-text').innerHTML = '<span>Changer de fichier</span>';
+    convertBtn.disabled = false;
+    hideError();
+    result.classList.remove('visible');
+    document.getElementById('features').style.display = 'none';
+  }
+
+  convertBtn.addEventListener('click', async () => {
+    if (!selectedFile) return;
+    convertBtn.disabled = true; hideError(); result.classList.remove('visible'); progressWrap.classList.add('visible');
+    const formData = new FormData();
+    if (adminCode) formData.append('adminCode', adminCode);
+    let endpoint;
+    if (mode === 'image') {
+      const imageFormat = document.getElementById('img-format').value;
+      if (imageFormat === 'pdf') {
+        endpoint = '/api/convert/images-pdf';
+        selectedFiles.forEach(file => formData.append('files', file));
+        formData.append('pageSize', document.getElementById('img-pdf-page-size').value);
+        formData.append('orientation', document.getElementById('img-pdf-orientation').value);
+        formData.append('fit', document.getElementById('img-pdf-fit').value);
+        formData.append('margin', document.getElementById('img-pdf-margin').value);
+      } else {
+        endpoint = '/api/convert/image';
+        formData.append('file', selectedFile);
+        formData.append('format', imageFormat);
+        formData.append('quality', document.getElementById('img-quality').value);
+        const w = document.getElementById('img-width').value;
+        const h = document.getElementById('img-height').value;
+        if (w) formData.append('width', w);
+        if (h) formData.append('height', h);
+      }
+    } else if (mode === 'video') {
+      const videoFormat = document.getElementById('vid-format').value;
+      endpoint = AUDIO_OUTPUT_FORMATS.includes(videoFormat) ? '/api/convert/audio' : '/api/convert/video';
+      formData.append('file', selectedFile);
+      formData.append('format', videoFormat);
+      formData.append('quality', document.getElementById('vid-quality').value);
+    } else if (mode === 'audio') {
+      endpoint = '/api/convert/audio';
+      formData.append('file', selectedFile);
+      formData.append('format', document.getElementById('aud-format').value);
+      formData.append('quality', document.getElementById('aud-quality').value);
+    } else if (mode === 'pdf') {
+      endpoint = '/api/convert/pdf';
+      formData.append('file', selectedFile);
+      formData.append('format', document.getElementById('pdf-format').value);
+      formData.append('dpi', document.getElementById('pdf-dpi').value);
+      formData.append('quality', document.getElementById('pdf-quality').value);
+      const page = document.getElementById('pdf-page').value;
+      if (page) formData.append('page', page);
+    } else {
+      endpoint = '/api/convert/data';
+      formData.append('file', selectedFile);
+      formData.append('format', document.getElementById('data-format').value);
+      formData.append('inputDelimiter', document.getElementById('data-input-delimiter').value);
+      formData.append('outputDelimiter', document.getElementById('data-output-delimiter').value);
+      formData.append('columns', document.getElementById('data-columns').value);
+      formData.append('typed', document.getElementById('data-typed').value);
+      formData.append('flatten', document.getElementById('data-flatten').value);
+    }
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', endpoint);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100);
+        progressFill.style.width = pct + '%';
+        progressFill.classList.remove('indeterminate');
+        if (pct < 100) { progressText.textContent = 'Upload ' + pct + '%'; }
+        else { progressText.textContent = 'Conversion en cours...'; progressFill.classList.add('indeterminate'); }
+      }
+    };
+    xhr.onload = () => {
+      progressWrap.classList.remove('visible');
+      try {
+        const data = JSON.parse(xhr.responseText);
+        if (xhr.status === 200 && data.downloadUrl) { showResult(data); }
+        else { showError(data.error || 'Erreur de conversion'); convertBtn.disabled = false; }
+      } catch { showError('Erreur de conversion'); convertBtn.disabled = false; }
+    };
+    xhr.onerror = () => { progressWrap.classList.remove('visible'); showError('Erreur reseau'); convertBtn.disabled = false; };
+    xhr.send(formData);
+  });
+
+  function showResult(data) {
+    downloadUrl = data.downloadUrl;
+    document.getElementById('res-orig').textContent = data.originalSize;
+    const convEl = document.getElementById('res-conv');
+    convEl.textContent = data.convertedSize;
+    const origBytes = parseSize(data.originalSize);
+    const convBytes = parseSize(data.convertedSize);
+    convEl.className = 'value' + (convBytes < origBytes ? ' smaller' : convBytes > origBytes ? ' bigger' : '');
+    setupPreview(data.preview);
+    result.classList.add('visible');
+  }
+
+  function setupPreview(preview) {
+    previewBox.innerHTML = '';
+    previewNote.textContent = '';
+    previewBtn.style.display = 'none';
+    previewBtn.onclick = null;
+
+    if (!preview) {
+      previewWrap.classList.remove('visible');
+      return;
+    }
+
+    previewWrap.classList.add('visible');
+    const load = () => renderPreview(preview);
+    if (preview.auto) {
+      load();
+    } else {
+      previewBox.innerHTML = '<div class="preview-note" style="padding:.8rem;text-align:center">Apercu disponible sur demande pour eviter de charger un gros fichier.</div>';
+      previewBtn.style.display = '';
+      previewBtn.onclick = load;
+    }
+  }
+
+  async function renderPreview(preview) {
+    previewBtn.style.display = 'none';
+    previewBox.innerHTML = '';
+    previewNote.textContent = preview.auto ? 'Apercu charge automatiquement.' : 'Apercu charge sur demande.';
+
+    if (preview.kind === 'image') {
+      const img = document.createElement('img');
+      img.alt = 'Apercu du fichier converti';
+      img.src = preview.url;
+      previewBox.appendChild(img);
+    } else if (preview.kind === 'video') {
+      const video = document.createElement('video');
+      video.controls = true;
+      video.preload = 'metadata';
+      video.src = preview.url;
+      previewBox.appendChild(video);
+    } else if (preview.kind === 'audio') {
+      const audio = document.createElement('audio');
+      audio.controls = true;
+      audio.preload = 'metadata';
+      audio.src = preview.url;
+      previewBox.appendChild(audio);
+    } else if (preview.kind === 'document') {
+      const iframe = document.createElement('iframe');
+      iframe.title = 'Apercu PDF';
+      iframe.src = preview.url;
+      iframe.style.height = '320px';
+      previewBox.appendChild(iframe);
+    } else if (preview.kind === 'text') {
+      const pre = document.createElement('pre');
+      pre.className = 'preview-text';
+      previewBox.appendChild(pre);
+      try {
+        const response = await fetch(preview.url);
+        const text = await response.text();
+        pre.textContent = text.length > 12000 ? text.slice(0, 12000) + '\\n... apercu tronque ...' : text;
+      } catch {
+        pre.textContent = "Impossible de charger l'apercu.";
+      }
+    }
+  }
+
+  document.getElementById('download-btn').addEventListener('click', () => { if (downloadUrl) { const a = document.createElement('a'); a.href = downloadUrl; a.click(); } });
+  document.getElementById('reset-btn').addEventListener('click', reset);
+
+  function reset() {
+    selectedFile = null; selectedFiles = []; downloadUrl = null;
+    fileInfo.classList.remove('visible');
+    dropzone.classList.remove('has-file');
+    dropzone.querySelector('.dropzone-icon').textContent = '+';
+    dropzone.querySelector('.dropzone-text').innerHTML = '<span>Choisir un fichier</span> ou glisser-deposer';
+    convertBtn.disabled = true;
+    result.classList.remove('visible');
+    previewWrap.classList.remove('visible');
+    previewBox.innerHTML = '';
+    previewNote.textContent = '';
+    progressWrap.classList.remove('visible');
+    document.getElementById('features').style.display = '';
+    hideError(); fileInput.value = '';
+  }
+
+  function showError(msg) { errorEl.textContent = msg; errorEl.classList.add('visible'); }
+  function hideError() { errorEl.classList.remove('visible'); }
+
+  function humanSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+  }
+  function parseSize(str) {
+    const m = str.match(/([\d.]+)\s*(B|KB|MB|GB)/);
+    if (!m) return 0;
+    const val = parseFloat(m[1]); const unit = m[2];
+    if (unit === 'B') return val; if (unit === 'KB') return val * 1024;
+    if (unit === 'MB') return val * 1024 * 1024; if (unit === 'GB') return val * 1024 * 1024 * 1024;
+    return 0;
+  }
+
+  function updateLimits() {
+    fetch('/api/status').then(r => r.json()).then(data => {
+      const limitsEl = document.getElementById('limits');
+      if (adminCode) { limitsEl.textContent = ''; }
+      else { limitsEl.textContent = 'Limites : images ' + data.maxImageSize + ', PDF ' + data.maxPdfSize + ', donnees ' + data.maxDataSize + ', audios ' + data.maxAudioSize + ', videos ' + data.maxVideoSize; }
+    }).catch(() => {});
+  }
+  updateLimits();
+
+  const adminToggle = document.getElementById('admin-toggle');
+  const adminPanel = document.getElementById('admin-panel');
+  const adminBadge = document.getElementById('admin-badge');
+
+  adminToggle.addEventListener('click', () => { adminPanel.classList.toggle('visible'); });
+
+  function setAdminActive(active) {
+    adminToggle.classList.toggle('active', active);
+    adminBadge.classList.toggle('visible', active);
+    updateLimits();
+  }
+
+  if (adminCode) {
+    fetch('/api/admin/check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: adminCode }) })
+      .then(r => { if (r.ok) setAdminActive(true); else { adminCode = ''; localStorage.removeItem('adminCode'); } }).catch(() => {});
+  }
+
+  document.getElementById('admin-btn').addEventListener('click', () => {
+    const code = document.getElementById('admin-code').value;
+    fetch('/api/admin/check', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) })
+      .then(r => {
+        if (r.ok) { adminCode = code; localStorage.setItem('adminCode', code); document.getElementById('admin-status').style.color = '#22c55e'; document.getElementById('admin-status').textContent = 'Active'; setAdminActive(true); setTimeout(() => adminPanel.classList.remove('visible'), 1000); }
+        else { document.getElementById('admin-status').style.color = '#ef5350'; document.getElementById('admin-status').textContent = 'Code invalide'; }
+      }).catch(() => { document.getElementById('admin-status').style.color = '#ef5350'; document.getElementById('admin-status').textContent = 'Erreur'; });
+  });
+  document.getElementById('admin-code').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('admin-btn').click(); });
+
+  // Auto-load file from URL param (cross-app integration with Universal DL)
+  const urlParams = new URLSearchParams(window.location.search);
+  const fileUrl = urlParams.get('fileUrl');
+  if (fileUrl) {
+    // Show loading state
+    dropzone.querySelector('.dropzone-icon').textContent = '...';
+    dropzone.querySelector('.dropzone-text').textContent = 'Chargement du fichier...';
+
+    fetch(fileUrl)
+      .then(r => {
+        if (!r.ok) throw new Error('Fichier introuvable');
+        const name = decodeURIComponent(fileUrl.split('/').pop().split('?')[0]) || 'video.mp4';
+        return r.blob().then(blob => new File([blob], name, { type: blob.type || 'video/mp4' }));
+      })
+      .then(file => {
+        selectFiles([file]);
+        document.getElementById('preload-banner').classList.add('visible');
+        document.getElementById('features').style.display = 'none';
+      })
+      .catch(() => {
+        dropzone.querySelector('.dropzone-icon').textContent = '+';
+        dropzone.querySelector('.dropzone-text').innerHTML = '<span>Choisir un fichier</span> ou glisser-deposer';
+      });
+  }
+})();
+</script>
+<div style="position:fixed;bottom:12px;right:12px;z-index:9999"><a href="https://ko-fi.com/purvanas" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#ff5e5b;color:#fff;border-radius:10px;font-size:13px;font-weight:600;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.3);font-family:-apple-system,sans-serif;transition:transform .2s" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">&#9749; Soutenir</a></div>
+<div id="bug-report" style="position:fixed;bottom:12px;left:12px;z-index:9998"><button type="button" id="bug-toggle" aria-expanded="false" aria-controls="bug-form" style="padding:6px 12px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#aaa;font-size:12px;cursor:pointer;font-family:-apple-system,sans-serif">&#128027; Bug ?</button><div id="bug-form" style="display:none;position:absolute;bottom:40px;left:0;background:#1e1e1e;border:1px solid #333;border-radius:10px;padding:12px;width:min(260px,calc(100vw - 24px))"><label for="bug-desc" style="display:block;color:#bbb;font-size:12px;margin-bottom:6px">Décris le problème</label><textarea id="bug-desc" style="width:100%;height:60px;background:#0a0a0a;border:1px solid #333;border-radius:6px;color:#ccc;padding:8px;font-size:12px;resize:none;font-family:-apple-system,sans-serif;margin-bottom:8px"></textarea><button type="button" id="bug-submit" style="width:100%;padding:6px;background:#7c4dff;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:-apple-system,sans-serif">Envoyer</button></div></div>
+<script>
+  (function () {
+    var toggle = document.getElementById('bug-toggle');
+    var form = document.getElementById('bug-form');
+    var submit = document.getElementById('bug-submit');
+    toggle.addEventListener('click', function () {
+      var open = form.style.display === 'block';
+      form.style.display = open ? 'none' : 'block';
+      toggle.setAttribute('aria-expanded', String(!open));
+      if (!open) document.getElementById('bug-desc').focus();
+    });
+    submit.addEventListener('click', function () {
+      var description = document.getElementById('bug-desc').value.trim();
+      if (!description) return;
+      submit.disabled = true;
+      fetch('/api/report-bug', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({error:description,page:location.pathname,userAgent:navigator.userAgent}) })
+        .then(function (response) { if (!response.ok) throw new Error('report'); form.innerHTML = '<p style="color:#4caf50;font-size:12px;text-align:center">Merci !</p>'; })
+        .catch(function () { submit.disabled = false; });
+    });
+  })();
+</script>
+<!-- LEGAL FOOTER -->
+<div id="legal-links" style="text-align:center;padding:1rem;font-size:.65rem">
+<a href="#" onclick="document.getElementById('legal-modal').style.display='flex';return false" style="color:#444;text-decoration:none">Mentions legales</a> · 
+<a href="#" onclick="document.getElementById('privacy-modal').style.display='flex';return false" style="color:#444;text-decoration:none">Politique de confidentialite</a> · 
+<a href="mailto:contact@purvanas.fr" style="color:#444;text-decoration:none">Contact</a>
+</div>
+
+<!-- LEGAL MODAL -->
+<div id="legal-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+<div style="background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;color:#ccc;font-size:.8rem;line-height:1.6">
+<h2 style="font-size:1rem;margin-bottom:12px;color:#fff">Mentions legales</h2>
+<p><strong>Editeur :</strong> Particulier, a titre personnel.<br><strong>Contact :</strong> contact@purvanas.fr<br><strong>Hebergement :</strong> Serveur auto-heberge en France, derriere Cloudflare.</p>
+<h3 style="font-size:.85rem;margin:12px 0 6px;color:#ddd">Description du service</h3>
+<p>Ce site propose des outils web gratuits (telechargement, conversion, partage de fichiers, generation de QR codes, edition photo, outils PDF, suppression de fond). Aucun compte utilisateur n est requis.</p>
+<h3 style="font-size:.85rem;margin:12px 0 6px;color:#ddd">Responsabilite</h3>
+<p>Conformement a l article 6 de la LCEN (Loi n 2004-575 du 21 juin 2004), l hebergeur n est pas responsable des contenus traites par les utilisateurs. Tout contenu signale comme illicite sera traite promptement.</p>
+<h3 style="font-size:.85rem;margin:12px 0 6px;color:#ddd">Propriete intellectuelle</h3>
+<p>Les outils sont open source et disponibles sur GitHub. Les fichiers traites par les utilisateurs restent leur propriete.</p>
+<button onclick="this.parentElement.parentElement.style.display='none'" style="margin-top:16px;padding:8px 20px;background:#2a2a2a;color:#ccc;border:none;border-radius:8px;cursor:pointer;font-size:.8rem">Fermer</button>
+</div>
+</div>
+
+<!-- PRIVACY MODAL -->
+<div id="privacy-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+<div style="background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;color:#ccc;font-size:.8rem;line-height:1.6">
+<h2 style="font-size:1rem;margin-bottom:12px;color:#fff">Politique de confidentialite</h2>
+<h3 style="font-size:.85rem;margin:12px 0 6px;color:#ddd">Donnees collectees</h3>
+<p>Ce site ne collecte aucune donnee personnelle directement. Aucun compte utilisateur, aucun formulaire d inscription, aucun cookie propre.</p>
+<h3 style="font-size:.85rem;margin:12px 0 6px;color:#ddd">Mesure d audience</h3>
+<p>Le code public n integre aucun service de mesure d audience ni script publicitaire. Une instance peut en ajouter dans sa propre configuration, sous la responsabilite de son exploitant.</p>
+<h3 style="font-size:.85rem;margin:12px 0 6px;color:#ddd">Fichiers traites</h3>
+<p>Les fichiers que vous uploadez (images, videos, PDF) sont traites temporairement puis supprimes automatiquement. Aucun fichier n est conserve de maniere permanente. Pour les outils cote client (QR Generator, PDF Tools), vos fichiers ne quittent jamais votre navigateur.</p>
+<h3 style="font-size:.85rem;margin:12px 0 6px;color:#ddd">Logs serveur</h3>
+<p>Les adresses IP sont enregistrees dans les logs du serveur web et conservees conformement au decret n 2011-219 du 25 fevrier 2011. Ces logs ne sont pas partages avec des tiers.</p>
+<h3 style="font-size:.85rem;margin:12px 0 6px;color:#ddd">Contact</h3>
+<p>Pour toute question relative a vos donnees : <a href="mailto:contact@purvanas.fr" style="color:#7c4dff">contact@purvanas.fr</a></p>
+<button onclick="this.parentElement.parentElement.style.display='none'" style="margin-top:16px;padding:8px 20px;background:#2a2a2a;color:#ccc;border:none;border-radius:8px;cursor:pointer;font-size:.8rem">Fermer</button>
+</div>
+</div>
+<script src="/i18n.js"></script>
+<script src="/en.js"></script>
+</body>
+</html>
