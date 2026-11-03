@@ -766,6 +766,7 @@
     }
     const xhr = new XMLHttpRequest();
     xhr.open('POST', endpoint);
+    if (adminCode) xhr.setRequestHeader('X-Admin-Code', adminCode);
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
         const pct = Math.round((e.loaded / e.total) * 100);
