@@ -821,7 +821,10 @@ function logError(type, error, extra) {
   const entry = { time: new Date().toISOString(), type, error: typeof error === "string" ? error.substring(0, 500) : String(error).substring(0, 500), ...extra };
   errorLogs.push(entry);
   if (errorLogs.length > 500) errorLogs = errorLogs.slice(-500);
-  try { fs.writeFileSync(ERRORS_FILE, JSON.stringify(errorLogs, null, 2)); } catch {}
+  try {
+    fs.writeFileSync(ERRORS_FILE, JSON.stringify(errorLogs, null, 2), { mode: 0o600 });
+    fs.chmodSync(ERRORS_FILE, 0o600);
+  } catch {}
   console.log("[ERROR-LOG] " + type + " — " + entry.error.substring(0, 100));
 }
 
