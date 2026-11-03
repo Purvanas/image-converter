@@ -32,6 +32,8 @@ const MAX_AUDIO_SIZE = 300 * 1024 * 1024; // 300 MB
 const MAX_VIDEO_SIZE = 500 * 1024 * 1024; // 500 MB
 const MAX_IMAGE_PDF_FILES = 50;
 const ADMIN_MAX_SIZE = 2 * 1024 * 1024 * 1024; // 2 GB (no real limit)
+const PUBLIC_UPLOAD_MAX_SIZE = positiveBytes(process.env.PUBLIC_UPLOAD_MAX_BYTES, MAX_VIDEO_SIZE);
+const ADMIN_UPLOAD_MAX_SIZE = positiveBytes(process.env.ADMIN_UPLOAD_MAX_BYTES, ADMIN_MAX_SIZE);
 
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
@@ -51,20 +53,6 @@ const storage = multer.diskStorage({
     cb(null, id + ext);
   },
 });
-const upload = multer({
-  storage,
-  limits: {
-    fileSize: ADMIN_CODE ? ADMIN_MAX_SIZE : MAX_VIDEO_SIZE,
-    files: MAX_IMAGE_PDF_FILES,
-    fields: 12,
-    parts: MAX_IMAGE_PDF_FILES + 12,
-    fieldNameSize: 100,
-    fieldSize: 64 * 1024,
-    fieldArrayIndexLimit: 0,
-    headerPairs: 100,
-  },
-});
-
 function matchesAdminCode(value) {
   if (!ADMIN_CODE || typeof value !== "string") return false;
   const expected = Buffer.from(ADMIN_CODE);
@@ -73,7 +61,47 @@ function matchesAdminCode(value) {
 }
 
 function isAdmin(req) {
-  return matchesAdminCode(req.body?.adminCode);
+  return req.uploadAdmin === true || matchesAdminCode(req.body?.adminCode);
+}
+
+function positiveBytes(value, fallback) {
+  const parsed = Number(value);
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function createUpload(fileSize) {
+  return multer({
+    storage,
+    limits: {
+      fileSize,
+      files: MAX_IMAGE_PDF_FILES,
+      fields: 12,
+      parts: MAX_IMAGE_PDF_FILES + 12,
+      fieldNameSize: 100,
+      fieldSize: 64 * 1024,
+      fieldArrayIndexLimit: 0,
+      headerPairs: 100,
+    },
+  });
+}
+
+const publicUpload = createUpload(PUBLIC_UPLOAD_MAX_SIZE);
+const adminUpload = createUpload(ADMIN_UPLOAD_MAX_SIZE);
+
+function selectUpload(publicMiddleware, adminMiddleware) {
+  return (req, res, next) => {
+    req.uploadAdmin = matchesAdminCode(req.get("x-admin-code"));
+    const middleware = req.uploadAdmin ? adminMiddleware : publicMiddleware;
+    middleware(req, res, next);
+  };
+}
+
+function singleUpload(field) {
+  return selectUpload(publicUpload.single(field), adminUpload.single(field));
+}
+
+function arrayUpload(field, maxCount) {
+  return selectUpload(publicUpload.array(field, maxCount), adminUpload.array(field, maxCount));
 }
 
 function hasErrorsToken(req) {
@@ -294,7 +322,7 @@ const IMAGE_MIMES = {
   "image/bmp": true, "image/svg+xml": true, "image/heic": true, "image/heif": true,
 };
 
-app.post("/api/convert/image", upload.single("file"), async (req, res) => {
+app.post("/api/convert/image", singleUpload("file"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file" });
   if (getMediaKind(req.file) !== "image") {
     cleanup(req.file.path);
@@ -383,7 +411,7 @@ const VIDEO_MIMES = {
   "video/x-flv": true, "video/ogg": true, "video/3gpp": true,
 };
 
-app.post("/api/convert/video", upload.single("file"), async (req, res) => {
+app.post("/api/convert/video", singleUpload("file"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file" });
   if (getMediaKind(req.file) !== "video") {
     cleanup(req.file.path);
@@ -472,7 +500,7 @@ app.post("/api/convert/video", upload.single("file"), async (req, res) => {
 // ===== AUDIO CONVERSION =====
 const AUDIO_FORMATS = getOutputFormats("audio");
 
-app.post("/api/convert/audio", upload.single("file"), async (req, res) => {
+app.post("/api/convert/audio", singleUpload("file"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file" });
   const inputKind = getMediaKind(req.file);
   if (inputKind !== "audio" && inputKind !== "video") {
@@ -550,7 +578,7 @@ app.post("/api/convert/audio", upload.single("file"), async (req, res) => {
 // ===== PDF CONVERSION =====
 const PDF_FORMATS = getOutputFormats("pdf");
 
-app.post("/api/convert/pdf", upload.single("file"), async (req, res) => {
+app.post("/api/convert/pdf", singleUpload("file"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file" });
   if (getMediaKind(req.file) !== "pdf") {
     cleanup(req.file.path);
@@ -628,7 +656,7 @@ app.post("/api/convert/pdf", upload.single("file"), async (req, res) => {
   }
 });
 
-app.post("/api/convert/images-pdf", upload.array("files", MAX_IMAGE_PDF_FILES), async (req, res) => {
+app.post("/api/convert/images-pdf", arrayUpload("files", MAX_IMAGE_PDF_FILES), async (req, res) => {
   const files = req.files || [];
   if (!files.length) return res.status(400).json({ error: "No files" });
   const admin = isAdmin(req);
@@ -658,7 +686,7 @@ app.post("/api/convert/images-pdf", upload.array("files", MAX_IMAGE_PDF_FILES), 
 // ===== DATA CONVERSION =====
 const DATA_FORMATS = getOutputFormats("data");
 
-app.post("/api/convert/data", upload.single("file"), async (req, res) => {
+app.post("/api/convert/data", singleUpload("file"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file" });
   if (getMediaKind(req.file) !== "data") {
     cleanup(req.file.path);

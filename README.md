@@ -40,11 +40,11 @@ npm start
 
 Les variables de `.env` ne sont pas chargées automatiquement : exporte-les avec ton gestionnaire de processus ou ton environnement d’exécution. Le serveur écoute par défaut sur `127.0.0.1:3400`, prévu pour être placé derrière un reverse proxy. `RUNTIME_DIR` permet de placer uploads, statistiques et journaux sur un volume séparé du code.
 
-Le mode administrateur est facultatif. Il reste désactivé tant que `ADMIN_CODE` n’est pas défini. Il relève les plafonds de traitement pour l’instance personnelle ; il ne constitue pas un système de comptes.
+Le mode administrateur est facultatif. Il reste désactivé tant que `ADMIN_CODE` n’est pas défini. L’interface transmet ce code dans un en-tête vérifié avant la lecture multipart : une requête publique conserve ainsi son plafond même lorsque le mode administrateur existe sur le serveur. Ce mécanisme relève les limites pour l’instance personnelle ; il ne constitue pas un système de comptes.
 
 ## Limites de l’instance
 
-Les limites publiques par défaut sont de 200 Mo pour les images et PDF, 50 Mo pour JSON/CSV, 300 Mo pour l’audio et 500 Mo pour la vidéo. Une conversion vidéo et deux conversions audio peuvent s’exécuter simultanément. Les valeurs sont adaptées à un petit serveur auto-hébergé.
+Les limites publiques par défaut sont de 200 Mo pour les images et PDF, 50 Mo pour JSON/CSV, 300 Mo pour l’audio et 500 Mo pour la vidéo. Le plafond multipart global vaut 500 Mo côté public et 2 Go après vérification administrateur ; les deux valeurs peuvent être réduites par l’environnement. Une conversion vidéo et deux conversions audio peuvent s’exécuter simultanément. Les valeurs sont adaptées à un petit serveur auto-hébergé.
 
 Ce dépôt ne contient ni fichiers utilisateurs, ni statistiques, ni journaux d’erreurs, ni configuration de production. Les identifiants d’analytics ou de publicité de l’instance hébergée sont également hors du code public.
 
