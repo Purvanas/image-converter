@@ -1,0 +1,14 @@
+node_modules/
+uploads/
+downloads/
+chunks/
+*.log
+errors.json
+stats.json
+reports.json
+cookies.txt
+.env
+.env.*
+!.env.example
+coverage/
+*.tmp
